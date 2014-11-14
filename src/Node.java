@@ -13,11 +13,11 @@ import java.util.ArrayList;
  */
 public class Node {
 
-    public ArrayList getMarker() {
+    public ArrayList<Integer> getMarker() {
         return marker;
     }
 
-    public void setMarker(ArrayList marker) {
+    public void setMarker(ArrayList<Integer> marker) {
         this.marker = marker;
     }
 
@@ -28,7 +28,7 @@ public class Node {
     public void setType(String type) {
         this.type = type;
     }
-    private ArrayList marker;
+    private ArrayList<Integer> marker;
     private String type;
     
     

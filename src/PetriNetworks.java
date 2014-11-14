@@ -1,6 +1,6 @@
 
 import java.io.File;
-import java.util.ArrayList;
+import java.util.ArrayList<Integer>;
 import java.util.HashSet;
 
 
@@ -26,7 +26,7 @@ public class PetriNetworks {
       
     }
     
-    private ArrayList enableTransition(ArrayList m){
+    private ArrayList<Integer> enableTransition(ArrayList<Integer> m){
         for(int i=0;i<m.size();i++){
             for(int j=0;j<t;t++){
                 //if(m.get(i) >= pre[i][t]){
@@ -37,7 +37,7 @@ public class PetriNetworks {
         return null;
     }
     
-    private ArrayList firingCondition(ArrayList m, ArrayList vk){
+    private ArrayList<Integer> firingCondition(ArrayList<Integer> m, ArrayList<Integer> vk){
     
         return null;
     }
