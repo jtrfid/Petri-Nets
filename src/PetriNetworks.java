@@ -1,5 +1,6 @@
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.HashSet;
 
 
@@ -18,18 +19,25 @@ public class PetriNetworks {
     int post[][];
     int pre[][];
     int m0[];
+    int p,t;
     
     public void reachabilityGraph(){
-    
+        
       
     }
     
-    private HashSet<Integer> enableTransition(HashSet<Integer> m){
-        
+    private ArrayList enableTransition(ArrayList m){
+        for(int i=0;i<m.size();i++){
+            for(int j=0;j<t;t++){
+                //if(m.get(i) >= pre[i][t]){
+                
+                //}
+            }
+        }
         return null;
     }
     
-    private HashSet<Integer> firingCondition(HashSet<Integer> m, HashSet<Integer> vk){
+    private ArrayList firingCondition(ArrayList m, ArrayList vk){
     
         return null;
     }

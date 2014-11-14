@@ -1,5 +1,6 @@
 
-import java.util.HashSet;
+import java.util.ArrayList;
+
 
 /*
  * To change this license header, choose License Headers in Project Properties.
@@ -11,15 +12,12 @@ import java.util.HashSet;
  * @author petergtam
  */
 public class Node {
-    private HashSet<Integer> marker;
-    private String type;
-    
-    
-    public HashSet<Integer> getMarker() {
+
+    public ArrayList getMarker() {
         return marker;
     }
 
-    public void setMarker(HashSet<Integer> marker) {
+    public void setMarker(ArrayList marker) {
         this.marker = marker;
     }
 
@@ -30,5 +28,9 @@ public class Node {
     public void setType(String type) {
         this.type = type;
     }
-
+    private ArrayList marker;
+    private String type;
+    
+    
+   
 }
