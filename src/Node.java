@@ -12,7 +12,28 @@ import java.util.ArrayList;
  * @author petergtam
  */
 public class Node {
+    private ArrayList<Integer> marker;
+    private char type;
+    private Node parent;
+    private ArrayList<Node> child;
 
+    public ArrayList<Node> getChild() {
+        return child;
+    }
+
+    public void setChild(ArrayList<Node> child) {
+        this.child = child;
+    }
+    private int transition;
+
+    public int getTransition() {
+        return transition;
+    }
+
+    public void setTransition(int transition) {
+        this.transition = transition;
+    }
+    
     public ArrayList<Integer> getMarker() {
         return marker;
     }
@@ -21,15 +42,22 @@ public class Node {
         this.marker = marker;
     }
 
-    public String getType() {
+    public char getType() {
         return type;
     }
 
-    public void setType(String type) {
+    public void setType(char type) {
         this.type = type;
     }
-    private ArrayList<Integer> marker;
-    private String type;
+   
+    public Node getParent() {
+        return parent;
+    }
+
+    public void setParent(Node parent) {
+        this.parent = parent;
+    }
+    
     
     
    

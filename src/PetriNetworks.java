@@ -1,8 +1,7 @@
 
 import java.io.File;
 import java.util.ArrayList;
-import java.util.HashSet;
-
+import java.util.Hashtable;
 
 
 /*
@@ -18,8 +17,9 @@ public class PetriNetworks {
     int c[][]; //Incidence matrix 
     int post[][];
     int pre[][];
-    int m0[];
+    Node n0;
     int p,t;
+    ArrayList<Node> rp  = new ArrayList();
     
     public void reachabilityGraph(){
         
@@ -27,14 +27,19 @@ public class PetriNetworks {
     }
     
     private ArrayList<Integer> enableTransition(ArrayList<Integer> m){
+        ArrayList<Integer> vk =new ArrayList(); //Firing vector 
+        
+        
         for(int i=0;i<m.size();i++){
             for(int j=0;j<t;t++){
-                //if(m.get(i) >= pre[i][t]){
-                
-                //}
+                if(m.get(i) >= pre[i][t]){
+                   if(!vk.contains(j)) {
+                        vk.add(j); 
+                   }
+                }
             }
         }
-        return null;
+        return vk;
     }
     
     private ArrayList<Integer> firingCondition(ArrayList<Integer> m, ArrayList<Integer> vk){
@@ -42,10 +47,27 @@ public class PetriNetworks {
         return null;
     }
     
-    private boolean reversibility(){
-    
+    private boolean reversibility(ArrayList rp){
+       for(int i=0;i<rp.size();i++){
+           for(int j=0;j<this.rp.get(i).getChild().size();j++ ) {
+               if(reversibility(this.rp.get(i).getChild().get(j))){
+                   return true;
+               }
+               else{
+                   return false;
+               }    
+           }
+        } 
       return true;
     }
+    
+    private boolean reversibility(Node n){
+      for(int i=0;i<this.n0.getChild().size();i++){
+          
+        } 
+      return true;
+    }
+    
     
     private boolean boundedness(){
     
@@ -53,7 +75,11 @@ public class PetriNetworks {
     }
     
     private boolean liveness(){
-    
+        for(int i=0;i<rp.size();i++){
+            if(this.rp.get(i).getType()=='t'){
+                return false;
+            }
+        }
       return true;
     }
     
