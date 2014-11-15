@@ -15,11 +15,12 @@ public class Node {
     private ArrayList<Integer> marker;
     private char type;
     private Node parent;
-    private ArrayList<Node> child; // Ya no es necesario los adjacentes seran sus hijos  
     private int id; 
     private Node next;
+    private int transition;
     
-     public Node(){}
+     
+    public Node(){}
      
     public Node(int id){
         this.id=id;
@@ -41,17 +42,6 @@ public class Node {
     public void setNext(Node next) {
         this.next = next;
     }
-   
-    
-
-    public ArrayList<Node> getChild() {
-        return child;
-    }
-
-    public void setChild(ArrayList<Node> child) {
-        this.child = child;
-    }
-    private int transition;
 
     public int getTransition() {
         return transition;

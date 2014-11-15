@@ -1,3 +1,6 @@
+
+import java.util.ArrayList;
+
 /*
  * Implementation of the Depth First Search using Adjacency Link List Representation with a queue
  */
@@ -12,6 +15,9 @@ public class DepthFirstSearchLinkList implements DepthFirstSearch{
     boolean visited[]; //Array that store if the node is visited
     private final static int DEFAULT_SIZE=6;
     int size=0;
+    String path="";
+    
+    
     
      //Creates the tree with the default size
     public DepthFirstSearchLinkList(){
@@ -32,8 +38,14 @@ public class DepthFirstSearchLinkList implements DepthFirstSearch{
     //Adds a pair of vertices
     @Override
     public void add(Node node1, Node node2) {
-        Node temp;
+        size++;
         
+        if(size>=tree.length){
+            Node temp[]=new Node[tree.length*2];
+            System.arraycopy(tree, 0, temp, 0, tree.length);
+        }
+        
+        Node temp;
         Node newNode1=new Node(); 
         newNode1.setId(node1.getId());
         
@@ -130,10 +142,17 @@ public class DepthFirstSearchLinkList implements DepthFirstSearch{
                
            }
          }
-         
+       size--;
+       
        return "("+node1.getId()+","+node2.getId()+")";
     }
     
+    @Override
+    public String totalPathFrom(Node root) {
+        pathFrom(root);
+        return path;
+    }
+
     
     //Walking through all the nodes of the graph starting from the specified node 
     @Override
@@ -148,7 +167,8 @@ public class DepthFirstSearchLinkList implements DepthFirstSearch{
       else{
          visited[actual]=true;  
          System.out.println("Node visited: "+actual);
-            
+         path=path+actual+",";
+         
          if(tree[actual]==null){ //Does have adjencety nodes
             return;
          }
@@ -176,6 +196,7 @@ public class DepthFirstSearchLinkList implements DepthFirstSearch{
         for (int a =0; a< visited.length;a++) {
             visited[a]=false;
         }
+        path="";
         
     }
     
@@ -199,6 +220,7 @@ public class DepthFirstSearchLinkList implements DepthFirstSearch{
     }	
     
      
+  /*   
    public static void main(String ar[]){ 
          DepthFirstSearchLinkList a= new  DepthFirstSearchLinkList(6);
          Node q1=new Node(1);
@@ -217,11 +239,11 @@ public class DepthFirstSearchLinkList implements DepthFirstSearch{
             a.add(q5,q3);
      
            System.out.println(a.toString());
-           a.pathFrom(q2);					 				 
+           
+           System.out.println(a.totalPathFrom(q2));
            
       }
-
-   
+*/
 
    
    

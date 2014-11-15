@@ -49,7 +49,16 @@ public class PetriNetworks {
     }
     
     private boolean reversibility(ArrayList rp){
-       
+        String path;
+        
+        for(int i=1;i<rp.size();i++){
+            path=g.totalPathFrom((Node)rp.get(i));
+            if(!path.contains("1")){ //If return to the initial state
+                return false;
+            }
+            g.cleanVisited(); //Clean de path 
+        }
+        
       return true;
     }
    
