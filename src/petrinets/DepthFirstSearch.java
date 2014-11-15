@@ -1,5 +1,5 @@
+package petrinets;
 
-import java.util.ArrayList;
 
 /*
  * Interface of DepthFirstSearch which is implemented in DepthFirstSearchLinkList
