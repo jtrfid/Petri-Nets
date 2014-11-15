@@ -20,6 +20,7 @@ public class PetriNetworks {
     Node n0;
     int p,t;
     ArrayList<Node> rp  = new ArrayList();
+    DepthFirstSearchLinkList g= new  DepthFirstSearchLinkList(6);
     
     public void reachabilityGraph(){
         
@@ -48,38 +49,32 @@ public class PetriNetworks {
     }
     
     private boolean reversibility(ArrayList rp){
-       for(int i=0;i<rp.size();i++){
-           for(int j=0;j<this.rp.get(i).getChild().size();j++ ) {
-               if(reversibility(this.rp.get(i).getChild().get(j))){
-                   return true;
-               }
-               else{
-                   return false;
-               }    
-           }
-        } 
+       
       return true;
     }
-    
-    private boolean reversibility(Node n){
-      for(int i=0;i<this.n0.getChild().size();i++){
-          
-        } 
-      return true;
-    }
-    
-    
+   
     private boolean boundedness(){
     
       return true;
     }
     
     private boolean liveness(){
+        ArrayList<Integer> transitions=new ArrayList();
+        
         for(int i=0;i<rp.size();i++){
             if(this.rp.get(i).getType()=='t'){
                 return false;
             }
+            
+            if(!transitions.contains(this.rp.get(i).getTransition())){
+                transitions.add(this.rp.get(i).getTransition());
+            }
         }
+        
+        if(transitions.size()!=t){
+            return false;
+        }
+        
       return true;
     }
     

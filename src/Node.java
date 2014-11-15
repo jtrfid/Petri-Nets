@@ -15,7 +15,34 @@ public class Node {
     private ArrayList<Integer> marker;
     private char type;
     private Node parent;
-    private ArrayList<Node> child;
+    private ArrayList<Node> child; // Ya no es necesario los adjacentes seran sus hijos  
+    private int id; 
+    private Node next;
+    
+     public Node(){}
+     
+    public Node(int id){
+        this.id=id;
+    }
+    
+
+    public int getId() {
+        return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
+    }
+
+    public Node getNext() {
+        return next;
+    }
+
+    public void setNext(Node next) {
+        this.next = next;
+    }
+   
+    
 
     public ArrayList<Node> getChild() {
         return child;
