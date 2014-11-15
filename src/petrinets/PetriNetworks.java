@@ -3,8 +3,6 @@ package petrinets;
 
 import java.io.File;
 import java.util.ArrayList;
-import java.util.Hashtable;
-
 
 /*
  * To change this template, choose Tools | Templates
@@ -23,10 +21,24 @@ public class PetriNetworks {
     int p,t;
     ArrayList<Node> rp  = new ArrayList();
     DepthFirstSearchLinkList g= new  DepthFirstSearchLinkList(6);
+    int size=0; //Numero de nodos creados que ademas almacenara el Id del nodo
+    
+    public void PetriNetworks(Node root){
+        n0=root;
+        size++;
+    }
+    
     
     public void reachabilityGraph(){
+         /*Pedro cada vez que se genera una transicion, creas un nodo y le pones de id el size y  aumentas el size
+          * y lo agregues al grafo g como una arista
+          */
         
-      
+        Node nuevo=new Node(size);
+        size++;
+       
+        //Falta agregarlo como arista 
+        
     }
     
     private ArrayList<Integer> enableTransition(ArrayList<Integer> m){

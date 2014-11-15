@@ -15,10 +15,9 @@ import java.util.ArrayList;
 public class DepthFirstSearchLinkList implements DepthFirstSearch{
     Node tree[]; //Array of the linked list
     boolean visited[]; //Array that store if the node is visited
-    private final static int DEFAULT_SIZE=6;
+    private final static int DEFAULT_SIZE=10;
     int size=0;
     String path="";
-    
     
     
      //Creates the tree with the default size
