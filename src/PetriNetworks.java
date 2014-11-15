@@ -16,12 +16,14 @@ public class PetriNetworks {
     int c[][]; //Incidence matrix 
     int post[][];
     int pre[][];
-    int m0[];
+    ArrayList<Integer> m0;
     Node n0;
     int p, t;
-    ArrayList<Node> rp = new ArrayList();
+    ArrayList<Node> rp;
 
     public PetriNetworks() {
+        m0 = new ArrayList<>();
+        rp = new ArrayList<>();
         try (Scanner s = new Scanner(System.in)) {
             System.out.print("Introduce the number of places: ");
             try {
@@ -38,8 +40,8 @@ public class PetriNetworks {
             System.out.println("Introduce the initial marking");
             String cadena = s.nextLine();
             String[] chars = cadena.split("\\s+");
-            for(int i=0;i<chars.length;i++){
-                m0[i] = Integer.parseInt(chars[i]);
+            for (String char1 : chars) {
+                m0.add(Integer.parseInt(char1));
             }
             pre = new int[p][t];
             post = new int[p][t];
@@ -119,7 +121,7 @@ public class PetriNetworks {
     }
 
     private ArrayList<Integer> firingCondition(ArrayList<Integer> m, ArrayList<Integer> vk) {
-
+        
         return null;
     }
 
@@ -174,10 +176,6 @@ public class PetriNetworks {
         File out = new File("out." + type);    // Windows
         gv.writeGraphToFile(gv.getGraph(gv.getDotSource(), type), out);
         
-    }
-
-    private Exception NumberFormatException(String error_No_es_un_numero) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 
 }
