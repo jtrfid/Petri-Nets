@@ -103,26 +103,46 @@ public class PetriNetworks {
     }
 
     public void reachabilityGraph() {
-
+        ArrayList<Integer> m1 = firingCondition(m0,enableTransition(m0));
+        System.out.println(m1);
     }
 
     private ArrayList<Integer> enableTransition(ArrayList<Integer> m) {
-        ArrayList<Integer> vk = new ArrayList(); //Firing vector 
+        ArrayList<Integer> vk = new ArrayList(); //Firing vector
+        boolean bandera = false;
         for (int i = 0; i < m.size(); i++) {
-            for (int j = 0; j < t; t++) {
-                if (m.get(i) >= pre[i][t]) {
-                    if (!vk.contains(j)) {
-                        vk.add(j);
-                    }
+            for (int j = 0; j < t; j++) {
+                if (m.get(i) < pre[i][j]) {
+                    bandera = true;
                 }
             }
+            if(!bandera)vk.add(1);
+            else vk.add(0);
         }
         return vk;
     }
 
     private ArrayList<Integer> firingCondition(ArrayList<Integer> m, ArrayList<Integer> vk) {
-        
-        return null;
+        ArrayList<Integer> result = new ArrayList<>();
+        ArrayList<Integer> multiplicacion = multiMatrix(c, vk);
+        for(int i = 0; i< m.size();i++){
+            result.add(m.get(i) + multiplicacion.get(i));
+        }
+        return result;
+    }
+    
+    private ArrayList<Integer> multiMatrix(int[][] m, ArrayList<Integer> vk){
+        ArrayList<Integer> result = new ArrayList<>();
+        int i = 0;
+        for(int[] mi : m){
+            int sum = 0;
+            for(int j = 0; j< mi.length;j++){
+                sum+=(m[i][j]*vk.get(j));
+            }
+            result.add(sum);
+            i++;
+        }
+        return result;
     }
 
     private boolean reversibility(ArrayList rp) {
@@ -161,7 +181,8 @@ public class PetriNetworks {
 
     public static void main(String[] ar) {
         PetriNetworks pn = new PetriNetworks();
-        GraphViz gv = new GraphViz();
+        pn.reachabilityGraph();
+        /*GraphViz gv = new GraphViz();
         gv.addln(gv.start_graph());
         gv.addln("node [shape=plain];\n"
                 + " node [fillcolor=\"#EEEEEE\"];\n"
@@ -175,7 +196,7 @@ public class PetriNetworks {
         String type = "png";
         File out = new File("out." + type);    // Windows
         gv.writeGraphToFile(gv.getGraph(gv.getDotSource(), type), out);
-        
+        */
     }
 
 }
