@@ -1,5 +1,8 @@
+package petrinets;
 
 import java.util.ArrayList;
+
+
 
 
 /*
@@ -15,16 +18,33 @@ public class Node {
     private ArrayList<Integer> marker;
     private char type;
     private Node parent;
-    private ArrayList<Node> child;
-
-    public ArrayList<Node> getChild() {
-        return child;
-    }
-
-    public void setChild(ArrayList<Node> child) {
-        this.child = child;
-    }
+    private int id; 
+    private Node next;
     private int transition;
+    
+     
+    public Node(){}
+     
+    public Node(int id){
+        this.id=id;
+    }
+    
+
+    public int getId() {
+        return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
+    }
+
+    public Node getNext() {
+        return next;
+    }
+
+    public void setNext(Node next) {
+        this.next = next;
+    }
 
     public int getTransition() {
         return transition;
