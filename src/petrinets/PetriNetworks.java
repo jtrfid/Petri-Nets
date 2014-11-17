@@ -1,7 +1,7 @@
 package petrinets;
 
-import java.io.File;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Scanner;
 
 /*
@@ -17,16 +17,15 @@ public class PetriNetworks {
     int c[][]; //Incidence matrix 
     int post[][]; //matriz post
     int pre[][]; //matriz pre
-    Node n0; //nodo inicial puede no ser necesario aki
+    Node n0; //nodo inicial
     int p, t; //tamaños de los lugares y las transiciones 
     ArrayList<Integer> m0; //marcdo inicial
-    ArrayList<Node> rp; //arreglo con los nodos 
+    ArrayList<Node> rp; //arreglo con los nodos
+    ArrayList<Node> procesados;
     DepthFirstSearchLinkList g = new DepthFirstSearchLinkList(6);
     int size = 0; //Numero de nodos creados que ademas almacenara el Id del nodo
 
-    public void PetriNetworks(Node root) {
-        n0 = root;
-        size++;
+    public PetriNetworks() {
         m0 = new ArrayList<>();
         rp = new ArrayList<>();
         try (Scanner s = new Scanner(System.in)) {
@@ -60,8 +59,8 @@ public class PetriNetworks {
 
     private void fillpre(Scanner s) {
         System.out.println("Introduce pre for each place");
-        for (int i = 0; i < p; i++) {
-            for (int j = 0; j < t; j++) {
+        for (int j = 0; j < t; j++) {
+            for (int i = 0; i < p; i++) {
                 System.out.print("p" + (i + 1) + "[" + (j + 1) + "]: ");
                 try {
                     pre[i][j] = Integer.parseInt(s.nextLine());
@@ -74,8 +73,8 @@ public class PetriNetworks {
 
     private void fillpost(Scanner s) {
         System.out.println("Introduce post for each place");
-        for (int i = 0; i < p; i++) {
-            for (int j = 0; j < t; j++) {
+        for (int j = 0; j < t; j++) {
+            for (int i = 0; i < p; i++) {
                 System.out.print("p" + (i + 1) + "[" + (j + 1) + "]: ");
                 try {
                     post[i][j] = Integer.parseInt(s.nextLine());
@@ -113,22 +112,83 @@ public class PetriNetworks {
          * y lo agregues al grafo g como una arista
          */
 
-        Node nuevo = new Node(size);
-        size++;
-
+        //Node nuevo = new Node(size);
+        //size++;
         //Falta agregarlo como arista 
+        //Lea hice parte del codigo... tengo mis dudas!!! lo vemos mañana en la noche??
+        n0 = new Node(size++);
+        n0.setMarker(m0);
+        n0.setType('f');
+        rp.add(n0);
+        procesados = new ArrayList<>();
+        while (!rp.isEmpty()) {
+            Node nk = rp.remove(0);
+            procesados.add(nk);
+            if (nk.getType() == 'f') {
+                ArrayList<Node> all = new ArrayList<>();
+                Collections.copy(rp, all);
+                all.addAll(procesados);
+                for (Node r : all) { //buscamos a ver si hay nodos duplicados
+                    if (r.getType() != 'f' && r.getMarker() == nk.getMarker()) {
+                        nk.setType('d');
+                    }
+                }
+                if (nk.getType() != 'd') {
+                    ArrayList<Integer> vk = enableTransition(nk.getMarker());
+                    if (vk.contains(1)) {
+                        for (int j = 0; j < vk.size(); j++) {
+                            if (vk.get(j) == 1) {
+                                ArrayList<Integer> mk = nk.getMarker();
+                                ArrayList<Integer> mz = firingCondition(mk, j);
+                                //se crea el nuevo nodo nz
+                                Node nz = new Node(size++);
+                                nz.setMarker(mz);
+                                //si mk en pi = w entonces mz en pi = w
+                                for (int i = 0; i < mk.size(); i++) {
+                                    if (mk.get(i) == Integer.MAX_VALUE) {
+                                        mz.set(i, Integer.MAX_VALUE);
+                                    }
+                                }
+                                //buscar un nodo nr tal que mr en pi < mz en pi
+                                Node x = nk.getParent();
+                                while (x != null) {
+                                    for (int i = 0; i < mk.size(); i++) {
+                                        if (x.getMarker().get(i) < mk.get(i)) {
+                                            mz.set(i, Integer.MAX_VALUE);
+                                        }
+                                    }
+                                    x = x.getParent();
+                                }
+                                //Se define el arco de la transicion
+                                nz.setParent(nk);
+                                nz.setTransition(j);
+                                nk.setType('e');
+                                nz.setType('f');
+                                //se agrega a rp
+                                rp.add(nz);
+                            }
+                        }
+                    } else {
+                        nk.setType('t');
+                    }
+                }
+            }
+        }
     }
 
     private ArrayList<Integer> enableTransition(ArrayList<Integer> m) {
         ArrayList<Integer> vk = new ArrayList(); //Firing vector
-        boolean bandera = false;
-        for (int i = 0; i < m.size(); i++) {
-            for (int j = 0; j < t; j++) {
-                if (m.get(i) < pre[i][j]) {
-                    bandera = true;
+        boolean isGreater = false;
+        for (int j = 0; j < t; j++) {
+            for (int i = 0; i < m.size(); i++) {
+                if (m.get(i) >= pre[i][j]) {
+                    isGreater = true;
+                } else {
+                    isGreater = false;
+                    break;
                 }
             }
-            if (!bandera) {
+            if (isGreater) {
                 vk.add(1);
             } else {
                 vk.add(0);
@@ -137,8 +197,27 @@ public class PetriNetworks {
         return vk;
     }
 
+    //funcion que dispara todas las transiciones activas
     private ArrayList<Integer> firingCondition(ArrayList<Integer> m, ArrayList<Integer> vk) {
         ArrayList<Integer> result = new ArrayList<>();
+        ArrayList<Integer> multiplicacion = multiMatrix(c, vk);
+        for (int i = 0; i < m.size(); i++) {
+            result.add(m.get(i) + multiplicacion.get(i));
+        }
+        return result;
+    }
+
+    //funcion que dispara la transicion tj
+    private ArrayList<Integer> firingCondition(ArrayList<Integer> m, int tj) {
+        ArrayList<Integer> result = new ArrayList<>();
+        ArrayList<Integer> vk = new ArrayList<>();
+        for (int i = 0; i < t; i++) {
+            if (i == tj) {
+                vk.add(1);
+            } else {
+                vk.add(0);
+            }
+        }
         ArrayList<Integer> multiplicacion = multiMatrix(c, vk);
         for (int i = 0; i < m.size(); i++) {
             result.add(m.get(i) + multiplicacion.get(i));
@@ -200,21 +279,27 @@ public class PetriNetworks {
     }
 
     public static void main(String[] ar) {
-        GraphViz gv = new GraphViz();
-        gv.addln(gv.start_graph());
-        gv.addln("node [shape=plain];\n"
-                + " node [fillcolor=\"#EEEEEE\"];\n"
-                + " node [color=\"#EEEEEE\"];\n"
-                + " edge [color=\"#31CEF0\"];");
+        PetriNetworks pn = new PetriNetworks();
+        pn.reachabilityGraph();
+        System.out.println("Imprimiendo los procesados:");
+        for (Node n : pn.procesados) {
+            System.out.println(n.getMarker());
+        }
+        /*GraphViz gv = new GraphViz();
+         gv.addln(gv.start_graph());
+         gv.addln("node [shape=plain];\n"
+         + " node [fillcolor=\"#EEEEEE\"];\n"
+         + " node [color=\"#EEEEEE\"];\n"
+         + " edge [color=\"#31CEF0\"];");
 
-        gv.addln("\"[09876]\" -> B [label=\"asddsfds\"];");
-        gv.addln(" t1 -> C;");
-        gv.addln(gv.end_graph());
+         gv.addln("\"[09876]\" -> B [label=\"asddsfds\"];");
+         gv.addln(" t1 -> C;");
+         gv.addln(gv.end_graph());
 
-        String type = "png";
-        File out = new File("out." + type);    // Windows
-        gv.writeGraphToFile(gv.getGraph(gv.getDotSource(), type), out);
-
+         String type = "png";
+         File out = new File("out." + type);    // Windows
+         gv.writeGraphToFile(gv.getGraph(gv.getDotSource(), type), out);
+         */
     }
 
 }
