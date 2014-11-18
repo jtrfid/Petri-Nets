@@ -60,8 +60,9 @@ public class PetriNetworks {
     private void fillpre(Scanner s) {
         System.out.println("Introduce pre for each place");
         for (int j = 0; j < t; j++) {
+            System.out.println("Transition" + (j+1));
             for (int i = 0; i < p; i++) {
-                System.out.print("p" + (i + 1) + "[" + (j + 1) + "]: ");
+                System.out.print("p" + (i + 1) + ": ");
                 try {
                     pre[i][j] = Integer.parseInt(s.nextLine());
                 } catch (Exception e) {
@@ -74,8 +75,9 @@ public class PetriNetworks {
     private void fillpost(Scanner s) {
         System.out.println("Introduce post for each place");
         for (int j = 0; j < t; j++) {
+            System.out.println("Transition" + (j+1));
             for (int i = 0; i < p; i++) {
-                System.out.print("p" + (i + 1) + "[" + (j + 1) + "]: ");
+                System.out.print("p" + (i + 1) + ": ");
                 try {
                     post[i][j] = Integer.parseInt(s.nextLine());
                 } catch (Exception e) {
@@ -120,18 +122,15 @@ public class PetriNetworks {
         n0.setMarker(m0);
         n0.setType('f');
         rp.add(n0);
-        procesados = new ArrayList<>();
         while (!rp.isEmpty()) {
             Node nk = rp.remove(0);
-            procesados.add(nk);
             if (nk.getType() == 'f') {
-                ArrayList<Node> all = new ArrayList<>();
-                Collections.copy(rp, all);
-                all.addAll(procesados);
-                for (Node r : all) { //buscamos a ver si hay nodos duplicados
-                    if (r.getType() != 'f' && r.getMarker() == nk.getMarker()) {
+                Node x = nk;
+                while (x != n0) {
+                    if (nk != x && nk.getMarker() == x.getMarker()) {
                         nk.setType('d');
                     }
+                    x = x.getParent();
                 }
                 if (nk.getType() != 'd') {
                     ArrayList<Integer> vk = enableTransition(nk.getMarker());
@@ -150,11 +149,24 @@ public class PetriNetworks {
                                     }
                                 }
                                 //buscar un nodo nr tal que mr en pi < mz en pi
-                                Node x = nk.getParent();
-                                while (x != null) {
-                                    for (int i = 0; i < mk.size(); i++) {
-                                        if (x.getMarker().get(i) < mk.get(i)) {
-                                            mz.set(i, Integer.MAX_VALUE);
+                                x = nk;
+                                while (x != n0) {
+                                    ArrayList<Integer> mr = x.getMarker();
+                                    if (mz != mr) {
+                                        boolean greatereq = false;
+                                        for (int i = 0; i < mz.size(); i++) {
+                                            if (mz.get(i) < mr.get(i)) {
+                                                break;
+                                            } else {
+                                                greatereq = true;
+                                            }
+                                        }
+                                        if (greatereq) {
+                                            for (int i = 0; i < mz.size(); i++) {
+                                                if (mz.get(i) > mr.get(i)){
+                                                    mz.set(i, Integer.MAX_VALUE);
+                                                }
+                                            }
                                         }
                                     }
                                     x = x.getParent();
