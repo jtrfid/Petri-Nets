@@ -71,7 +71,7 @@ public class PetriNetworks {
             }
         }
     }
-
+ 
     private void fillpost(Scanner s) {
         System.out.println("Introduce post for each place");
         for (int j = 0; j < t; j++) {
@@ -118,6 +118,7 @@ public class PetriNetworks {
         //size++;
         //Falta agregarlo como arista 
         //Lea hice parte del codigo... tengo mis dudas!!! lo vemos mañana en la noche??
+        //nuevo comentario
         n0 = new Node(size++);
         n0.setMarker(m0);
         n0.setType('f');
