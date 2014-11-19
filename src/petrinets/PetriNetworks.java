@@ -1,5 +1,6 @@
 package petrinets;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Scanner;
@@ -15,8 +16,8 @@ import java.util.Scanner;
 public class PetriNetworks {
 
     int c[][]; //Incidence matrix 
-    int post[][]; //matriz post
-    int pre[][]; //matriz pre
+    int post[][] = {{1, 0, 0}, {1, 1, 0}, {0, 1, 1}}; //matriz post
+    int pre[][] = {{1, 1, 0}, {0, 0, 1}, {0, 0, 1}}; //matriz pre
     Node n0; //nodo inicial
     int p, t; //tamaños de los lugares y las transiciones 
     ArrayList<Integer> m0; //marcdo inicial
@@ -28,6 +29,7 @@ public class PetriNetworks {
     public PetriNetworks() {
         m0 = new ArrayList<>();
         rp = new ArrayList<>();
+        procesados = new ArrayList<>();
         try (Scanner s = new Scanner(System.in)) {
             System.out.print("Introduce the number of places: ");
             try {
@@ -41,17 +43,15 @@ public class PetriNetworks {
             } catch (Exception e) {
                 throw new NumberFormatException("Error: No es un numero");
             }
-            System.out.println("Introduce the initial marking");
-            String cadena = s.nextLine();
-            String[] chars = cadena.split("\\s+");
-            for (String char1 : chars) {
-                m0.add(Integer.parseInt(char1));
-            }
-            pre = new int[p][t];
-            post = new int[p][t];
+
             c = new int[p][t];
-            fillpre(s);
-            fillpost(s);
+
+            m0.add(1);
+            m0.add(0);
+            m0.add(0);
+
+            // fillpre(s);
+            // fillpost(s);
         }
         fillc();
 
@@ -60,7 +60,7 @@ public class PetriNetworks {
     private void fillpre(Scanner s) {
         System.out.println("Introduce pre for each place");
         for (int j = 0; j < t; j++) {
-            System.out.println("Transition" + (j+1));
+            System.out.println("Transition" + (j + 1));
             for (int i = 0; i < p; i++) {
                 System.out.print("p" + (i + 1) + ": ");
                 try {
@@ -71,11 +71,11 @@ public class PetriNetworks {
             }
         }
     }
- 
+
     private void fillpost(Scanner s) {
         System.out.println("Introduce post for each place");
         for (int j = 0; j < t; j++) {
-            System.out.println("Transition" + (j+1));
+            System.out.println("Transition" + (j + 1));
             for (int i = 0; i < p; i++) {
                 System.out.print("p" + (i + 1) + ": ");
                 try {
@@ -110,83 +110,110 @@ public class PetriNetworks {
     }
 
     public void reachabilityGraph() {
-        /*Pedro cada vez que se genera una transicion, creas un nodo y le pones de id el size y  aumentas el size
-         * y lo agregues al grafo g como una arista
-         */
-
-        //Node nuevo = new Node(size);
-        //size++;
-        //Falta agregarlo como arista 
-        //Lea hice parte del codigo... tengo mis dudas!!! lo vemos mañana en la noche??
-        //nuevo comentario
         n0 = new Node(size++);
         n0.setMarker(m0);
         n0.setType('f');
+        n0.setParent(null);
+
         rp.add(n0);
-        while (!rp.isEmpty()) {
-            Node nk = rp.remove(0);
+        procesados.add(n0);
+
+        while (!procesados.isEmpty()) {
+            Node nk = procesados.remove(0);
+
             if (nk.getType() == 'f') {
-                Node x = nk;
-                while (x != n0) {
-                    if (nk != x && nk.getMarker() == x.getMarker()) {
+                //Buscar duplicado en rp
+                for (int i = 0; i < rp.size(); i++) {
+                    if (rp.get(i).getType() != 'f' && nk.getMarker().equals(rp.get(i).getMarker())) {
                         nk.setType('d');
+                        cambiaTipo(nk,'d');
+                        g.add(nk.getParent().get(0),rp.get(i));
                     }
-                    x = x.getParent();
                 }
+
                 if (nk.getType() != 'd') {
+                    //Transiciones habilitadas
                     ArrayList<Integer> vk = enableTransition(nk.getMarker());
                     if (vk.contains(1)) {
                         for (int j = 0; j < vk.size(); j++) {
                             if (vk.get(j) == 1) {
-                                ArrayList<Integer> mk = nk.getMarker();
-                                ArrayList<Integer> mz = firingCondition(mk, j);
                                 //se crea el nuevo nodo nz
                                 Node nz = new Node(size++);
-                                nz.setMarker(mz);
+                                nz.getParent().add(nk);
+                                nz.setMarker(firingCondition(nk.getMarker(), j));
+
                                 //si mk en pi = w entonces mz en pi = w
-                                for (int i = 0; i < mk.size(); i++) {
-                                    if (mk.get(i) == Integer.MAX_VALUE) {
-                                        mz.set(i, Integer.MAX_VALUE);
+                                for (int i = 0; i < nk.getMarker().size(); i++) {
+                                    if (nk.getMarker().get(i) == Integer.MAX_VALUE) {
+                                        nz.getMarker().set(i, Integer.MAX_VALUE);
                                     }
                                 }
-                                //buscar un nodo nr tal que mr en pi < mz en pi
-                                x = nk;
-                                while (x != n0) {
-                                    ArrayList<Integer> mr = x.getMarker();
-                                    if (mz != mr) {
-                                        boolean greatereq = false;
-                                        for (int i = 0; i < mz.size(); i++) {
-                                            if (mz.get(i) < mr.get(i)) {
-                                                break;
-                                            } else {
-                                                greatereq = true;
-                                            }
-                                        }
-                                        if (greatereq) {
-                                            for (int i = 0; i < mz.size(); i++) {
-                                                if (mz.get(i) > mr.get(i)){
-                                                    mz.set(i, Integer.MAX_VALUE);
-                                                }
-                                            }
-                                        }
-                                    }
-                                    x = x.getParent();
-                                }
-                                //Se define el arco de la transicion
-                                nz.setParent(nk);
+
+                                nz.setMarker(buscaMayor(nz, nz));
                                 nz.setTransition(j);
-                                nk.setType('e');
                                 nz.setType('f');
-                                //se agrega a rp
+
+                                nk.getChildren().add(nz);
+                                g.add(nk, nz);
+                                
+                                
                                 rp.add(nz);
+                                procesados.add(nz);
                             }
                         }
+                        nk.setType('e');
+                        cambiaTipo(nk, 'e');
+                        asignaNiños(nk, nk.getChildren());
+
                     } else {
                         nk.setType('t');
+                        cambiaTipo(nk, 't');
+                    }
+                }
+            }
+
+        }
+    }
+
+    private void asignaNiños(Node nk, ArrayList<Node> children) {
+        for (int i = 0; i < rp.size(); i++) {
+            if (rp.get(i).getId() == nk.getId()) {
+                rp.get(i).setChildren(children);
+            }
+        }
+
+    }
+
+    private void cambiaTipo(Node nk, char t) {
+        for (int i = 0; i < rp.size(); i++) {
+            if (rp.get(i).getId() == nk.getId()) {
+                rp.get(i).setType(t);
+            }
+        }
+    }
+
+    private ArrayList<Integer> buscaMayor(Node nk, Node nz) {
+        ArrayList<Integer> marker = nz.getMarker();
+
+        for (int j = 0; j < nk.getParent().size(); j++) {
+            boolean mayornz = true;
+
+            for (int i = 0; i < nk.getParent().get(j).getMarker().size(); i++) {
+                if (nz.getMarker().get(i) < nk.getParent().get(j).getMarker().get(i)) {
+                    mayornz = false;
+                    break;
+                }
+            }
+            if (mayornz) {
+                for (int a = 0; a < nk.getMarker().size(); a++) {
+                    if (nz.getMarker().get(a) > nk.getParent().get(j).getMarker().get(a)) {
+                        marker.set(a, Integer.MAX_VALUE);
                     }
                 }
             }
         }
+
+        return marker;
     }
 
     private ArrayList<Integer> enableTransition(ArrayList<Integer> m) {
@@ -232,9 +259,17 @@ public class PetriNetworks {
             }
         }
         ArrayList<Integer> multiplicacion = multiMatrix(c, vk);
+
         for (int i = 0; i < m.size(); i++) {
             result.add(m.get(i) + multiplicacion.get(i));
         }
+
+        for (int i = 0; i < result.size(); i++) {
+            if (result.get(i) < 0) {
+                result.set(i, Integer.MAX_VALUE);
+            }
+        }
+
         return result;
     }
 
@@ -252,9 +287,11 @@ public class PetriNetworks {
         return result;
     }
 
-    private boolean reversibility(ArrayList rp) {
+    private boolean reversibility() {
         String path;
-
+        
+       System.out.println("TAmaño "+g.size);
+        
         for (int i = 1; i < rp.size(); i++) {
             path = g.totalPathFrom((Node) rp.get(i));
             if (!path.contains("1")) { //If return to the initial state
@@ -267,7 +304,11 @@ public class PetriNetworks {
     }
 
     private boolean boundedness() {
-
+        for (int i = 0; i < rp.size(); i++) {
+            if(rp.get(i).getMarker().contains(Integer.MAX_VALUE)){
+                return false;
+        }
+        }
         return true;
     }
 
@@ -291,28 +332,38 @@ public class PetriNetworks {
         return true;
     }
 
+    public void printGraph() {
+        for (int i = 0; i < rp.size(); i++) {
+            System.out.println(rp.get(i).getMarker() + " " + rp.get(i).getType() + "T" + rp.get(i).getTransition());
+        }
+        
+        System.out.println("Liveness: "+liveness());
+        System.out.println("Boundedness: "+boundedness());
+        System.out.println("Reversibility: "+reversibility());
+        
+    }
+
     public static void main(String[] ar) {
         PetriNetworks pn = new PetriNetworks();
         pn.reachabilityGraph();
-        System.out.println("Imprimiendo los procesados:");
-        for (Node n : pn.procesados) {
-            System.out.println(n.getMarker());
-        }
-        /*GraphViz gv = new GraphViz();
+        pn.printGraph();
+
+         GraphViz gv = new GraphViz();
          gv.addln(gv.start_graph());
-         gv.addln("node [shape=plain];\n"
+         gv.addln("node [shape=box];\n"
          + " node [fillcolor=\"#EEEEEE\"];\n"
          + " node [color=\"#EEEEEE\"];\n"
          + " edge [color=\"#31CEF0\"];");
 
          gv.addln("\"[09876]\" -> B [label=\"asddsfds\"];");
          gv.addln(" t1 -> C;");
+         
          gv.addln(gv.end_graph());
 
+         
          String type = "png";
          File out = new File("out." + type);    // Windows
          gv.writeGraphToFile(gv.getGraph(gv.getDotSource(), type), out);
-         */
+       
     }
-
 }

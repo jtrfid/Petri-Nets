@@ -17,16 +17,37 @@ import java.util.ArrayList;
 public class Node {
     private ArrayList<Integer> marker;
     private char type;
-    private Node parent;
     private int id; 
     private Node next;
     private int transition;
     
+    private ArrayList<Node> children;
+    private ArrayList<Node> parent;
+
+    public ArrayList<Node> getParent() {
+        return parent;
+    }
+
+    public void setParent(ArrayList<Node> parent) {
+        this.parent = parent;
+    }
+
+    public ArrayList<Node> getChildren() {
+        return children;
+    }
+
+    public void setChildren(ArrayList<Node> children) {
+        this.children = children;
+    }
+
      
     public Node(){}
      
     public Node(int id){
         this.id=id;
+        this.marker=new ArrayList();
+        this.children=new ArrayList();
+        this.parent=new ArrayList();
     }
     
 
@@ -70,11 +91,5 @@ public class Node {
         this.type = type;
     }
    
-    public Node getParent() {
-        return parent;
-    }
-
-    public void setParent(Node parent) {
-        this.parent = parent;
-    }
+  
 }
