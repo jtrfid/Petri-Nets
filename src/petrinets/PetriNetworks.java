@@ -23,13 +23,15 @@ public class PetriNetworks {
     ArrayList<Integer> m0; //marcdo inicial
     ArrayList<Node> rp; //arreglo con los nodos
     ArrayList<Node> procesados;
-    DepthFirstSearchLinkList g = new DepthFirstSearchLinkList(6);
+    DepthFirstSearchLinkList g;
     int size = 0; //Numero de nodos creados que ademas almacenara el Id del nodo
 
     public PetriNetworks() {
         m0 = new ArrayList<>();
         rp = new ArrayList<>();
         procesados = new ArrayList<>();
+        g= new DepthFirstSearchLinkList(10);
+        
         try (Scanner s = new Scanner(System.in)) {
             System.out.print("Introduce the number of places: ");
             try {
@@ -128,6 +130,7 @@ public class PetriNetworks {
                         nk.setType('d');
                         cambiaTipo(nk,'d');
                         g.add(nk.getParent().get(0),rp.get(i));
+                        break;
                     }
                 }
 
@@ -155,7 +158,6 @@ public class PetriNetworks {
 
                                 nk.getChildren().add(nz);
                                 g.add(nk, nz);
-                                
                                 
                                 rp.add(nz);
                                 procesados.add(nz);
@@ -288,13 +290,11 @@ public class PetriNetworks {
     }
 
     private boolean reversibility() {
-        String path;
-        
-       System.out.println("TAmaño "+g.size);
-        
+       String path;
+     
         for (int i = 1; i < rp.size(); i++) {
             path = g.totalPathFrom((Node) rp.get(i));
-            if (!path.contains("1")) { //If return to the initial state
+            if (!path.contains("0")) { //If return to the initial state
                 return false;
             }
             g.cleanVisited(); //Clean de path 
@@ -343,6 +343,9 @@ public class PetriNetworks {
         
     }
 
+    
+    
+    
     public static void main(String[] ar) {
         PetriNetworks pn = new PetriNetworks();
         pn.reachabilityGraph();
@@ -351,17 +354,26 @@ public class PetriNetworks {
          GraphViz gv = new GraphViz();
          gv.addln(gv.start_graph());
          gv.addln("node [shape=box];\n"
-         + " node [fillcolor=\"#EEEEEE\"];\n"
-         + " node [color=\"#EEEEEE\"];\n"
-         + " edge [color=\"#31CEF0\"];");
+         + " node [fillcolor=\"white\"];\n"
+         + " node [color=\"black\"];\n"
+         + " edge [color=\"black\"];");
 
-         gv.addln("\"[09876]\" -> B [label=\"asddsfds\"];");
-         gv.addln(" t1 -> C;");
+         String arbol=pn.g.toString();
+         String array []= arbol.split("\n");
          
+         for(int i=0;i<array.length;i++){
+             String nodos[]=array[i].split(" ");
+             
+             for(int j=1;j<nodos.length;j++){
+                gv.addln("\""+pn.g.buscaNodo(Integer.parseInt(nodos[0])).getMarker()+"\" ->\""+
+                        pn.g.buscaNodo(Integer.parseInt(nodos[j])).getMarker()+"\"[label=\""+
+                        pn.g.buscaNodo(Integer.parseInt(nodos[j])).getTransition()+"\"];");
+             }
+         }
+           
          gv.addln(gv.end_graph());
 
-         
-         String type = "png";
+        String type = "png";
          File out = new File("out." + type);    // Windows
          gv.writeGraphToFile(gv.getGraph(gv.getDotSource(), type), out);
        

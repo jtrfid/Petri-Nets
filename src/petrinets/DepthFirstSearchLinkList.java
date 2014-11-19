@@ -24,7 +24,7 @@ public class DepthFirstSearchLinkList implements DepthFirstSearch{
     public DepthFirstSearchLinkList(){
         tree=new Node[DEFAULT_SIZE];
         visited=new boolean[DEFAULT_SIZE];
-        size=DEFAULT_SIZE;
+        size=0;
     }
     
     //Creates the tree with a specified size
@@ -33,7 +33,7 @@ public class DepthFirstSearchLinkList implements DepthFirstSearch{
         
         tree=new Node[tam];
         visited=new boolean[tam];
-        size=tam;
+        size=0;
     }
 
     //Adds a pair of vertices
@@ -47,20 +47,16 @@ public class DepthFirstSearchLinkList implements DepthFirstSearch{
         }
         
         Node temp;
-        Node newNode1=new Node(); 
-        newNode1.setId(node1.getId());
-        
-        Node newNode2=new Node();
-        newNode2.setId(node2.getId());
+
         
         //Store in the matrix its adjacent node 
         if(tree[node1.getId()]==null){  //If is the first node
-            tree[node1.getId()]=newNode2;
+            tree[node1.getId()]=node2;
         }
         else{ 
             temp=tree[node1.getId()];
-            newNode2.setNext(temp);
-            tree[node1.getId()]=newNode2;
+            node2.setNext(temp);
+            tree[node1.getId()]=node2;
         }
         
         //Store in the matrix its adjacent node 
@@ -167,7 +163,7 @@ public class DepthFirstSearchLinkList implements DepthFirstSearch{
       }
       else{
          visited[actual]=true;  
-         System.out.println("Node visited: "+actual);
+       //  System.out.println("Node visited: "+actual);
          path=path+actual+",";
          
          if(tree[actual]==null){ //Does have adjencety nodes
@@ -209,7 +205,7 @@ public class DepthFirstSearchLinkList implements DepthFirstSearch{
         
         for(int i=0;i<size;i++){   
             temp=tree[i];
-            cadena=cadena+"i= "+i+"|";
+            cadena=cadena+i+" ";
             while(temp!=null){
                 cadena=cadena+temp.getId() +" "; 
                 temp=temp.getNext();
@@ -220,9 +216,11 @@ public class DepthFirstSearchLinkList implements DepthFirstSearch{
         return cadena; 
     }	
     
-     
-  /*   
-   public static void main(String ar[]){ 
+public Node buscaNodo(int id){
+        return tree[id];
+    } 
+  
+  /* public static void main(String ar[]){ 
          DepthFirstSearchLinkList a= new  DepthFirstSearchLinkList(6);
          Node q1=new Node(1);
          Node q2=new Node(2);
@@ -244,8 +242,7 @@ public class DepthFirstSearchLinkList implements DepthFirstSearch{
            System.out.println(a.totalPathFrom(q2));
            
       }
-*/
 
-   
+   */
    
 }
