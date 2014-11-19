@@ -334,48 +334,39 @@ public class PetriNetworks {
 
     public void printGraph() {
         for (int i = 0; i < rp.size(); i++) {
-            System.out.println(rp.get(i).getMarker() + " " + rp.get(i).getType() + "T" + rp.get(i).getTransition());
+            System.out.println(rp.get(i).getMarker() + " " + rp.get(i).getType() + "t" + rp.get(i).getTransition());
         }
         
         System.out.println("Liveness: "+liveness());
         System.out.println("Boundedness: "+boundedness());
         System.out.println("Reversibility: "+reversibility());
         
-    }
-
-    
-    
-    
-    public static void main(String[] ar) {
-        PetriNetworks pn = new PetriNetworks();
-        pn.reachabilityGraph();
-        pn.printGraph();
-
          GraphViz gv = new GraphViz();
          gv.addln(gv.start_graph());
          gv.addln("node [shape=box];\n"
          + " node [fillcolor=\"white\"];\n"
          + " node [color=\"black\"];\n"
          + " edge [color=\"black\"];");
-
-         String arbol=pn.g.toString();
-         String array []= arbol.split("\n");
-         
-         for(int i=0;i<array.length;i++){
-             String nodos[]=array[i].split(" ");
-             
-             for(int j=1;j<nodos.length;j++){
-                gv.addln("\""+pn.g.buscaNodo(Integer.parseInt(nodos[0])).getMarker()+"\" ->\""+
-                        pn.g.buscaNodo(Integer.parseInt(nodos[j])).getMarker()+"\"[label=\""+
-                        pn.g.buscaNodo(Integer.parseInt(nodos[j])).getTransition()+"\"];");
-             }
+        
+         for(int i=0;i<rp.size();i++){
+             for(int j=0;j<rp.get(i).getChildren().size();j++){
+                gv.addln("\""+rp.get(i).getMarker()+"\" ->"+"\""+rp.get(i).getChildren().get(j).getMarker()
+                        +"\" [label=\"t"+rp.get(i).getChildren().get(j).getTransition()+"\"];");
+            }  
          }
            
-         gv.addln(gv.end_graph());
+        gv.addln(gv.end_graph());
 
-        String type = "png";
+         String type = "png";
          File out = new File("out." + type);    // Windows
          gv.writeGraphToFile(gv.getGraph(gv.getDotSource(), type), out);
-       
+    }
+
+    
+    public static void main(String[] ar) {
+        PetriNetworks pn = new PetriNetworks();
+        pn.reachabilityGraph();
+        pn.printGraph();
+
     }
 }
