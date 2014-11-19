@@ -20,7 +20,6 @@ public class Node {
     private int id; 
     private Node next;
     private int transition;
-    
     private ArrayList<Node> children;
     private ArrayList<Node> parent;
 

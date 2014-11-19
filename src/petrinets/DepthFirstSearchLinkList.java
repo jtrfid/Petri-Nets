@@ -41,14 +41,15 @@ public class DepthFirstSearchLinkList implements DepthFirstSearch{
     public void add(Node node1, Node node2) {
         size++;
         
+        
         if(size>=tree.length){
-            Node temp[]=new Node[tree.length*2];
-            System.arraycopy(tree, 0, temp, 0, tree.length);
+            Node x[]=new Node[tree.length*2];
+            System.arraycopy(tree, 0, x, 0, tree.length);
+            tree=x;    
         }
         
         Node temp;
 
-        
         //Store in the matrix its adjacent node 
         if(tree[node1.getId()]==null){  //If is the first node
             tree[node1.getId()]=node2;
@@ -58,16 +59,6 @@ public class DepthFirstSearchLinkList implements DepthFirstSearch{
             node2.setNext(temp);
             tree[node1.getId()]=node2;
         }
-        
-        //Store in the matrix its adjacent node 
-        /*if(tree[node2.getId()]==null){ 
-            tree[node2.getId()]=newNode1;
-        }
-        else{ 
-            temp=tree[node2.getId()];
-            newNode1.setNext(temp);
-            tree[node2.getId()]=newNode1;
-        }*/
     }
 
     

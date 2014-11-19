@@ -18,6 +18,7 @@ public class PetriNetworks {
     int c[][]; //Incidence matrix 
     int post[][] = {{1, 0, 0}, {1, 1, 0}, {0, 1, 1}}; //matriz post
     int pre[][] = {{1, 1, 0}, {0, 0, 1}, {0, 0, 1}}; //matriz pre
+    
     Node n0; //nodo inicial
     int p, t; //tamaños de los lugares y las transiciones 
     ArrayList<Integer> m0; //marcdo inicial
@@ -26,12 +27,26 @@ public class PetriNetworks {
     DepthFirstSearchLinkList g;
     int size = 0; //Numero de nodos creados que ademas almacenara el Id del nodo
 
+    public PetriNetworks(int p, int t, int pre[][], int pos[][], ArrayList<Integer> m0) {
+        this.p = p;
+        this.t = p;
+        this.pre = pre;
+        this.post = pos;
+        this.m0 = m0;
+
+        g = new DepthFirstSearchLinkList(10);
+        rp = new ArrayList<>();
+        procesados = new ArrayList<>();
+
+        fillc();
+    }
+
     public PetriNetworks() {
         m0 = new ArrayList<>();
         rp = new ArrayList<>();
         procesados = new ArrayList<>();
-        g= new DepthFirstSearchLinkList(10);
-        
+        g = new DepthFirstSearchLinkList(10);
+
         try (Scanner s = new Scanner(System.in)) {
             System.out.print("Introduce the number of places: ");
             try {
@@ -51,42 +66,11 @@ public class PetriNetworks {
             m0.add(1);
             m0.add(0);
             m0.add(0);
+           
 
-            // fillpre(s);
-            // fillpost(s);
         }
         fillc();
 
-    }
-
-    private void fillpre(Scanner s) {
-        System.out.println("Introduce pre for each place");
-        for (int j = 0; j < t; j++) {
-            System.out.println("Transition" + (j + 1));
-            for (int i = 0; i < p; i++) {
-                System.out.print("p" + (i + 1) + ": ");
-                try {
-                    pre[i][j] = Integer.parseInt(s.nextLine());
-                } catch (Exception e) {
-                    throw new NumberFormatException("Error: No es un numero");
-                }
-            }
-        }
-    }
-
-    private void fillpost(Scanner s) {
-        System.out.println("Introduce post for each place");
-        for (int j = 0; j < t; j++) {
-            System.out.println("Transition" + (j + 1));
-            for (int i = 0; i < p; i++) {
-                System.out.print("p" + (i + 1) + ": ");
-                try {
-                    post[i][j] = Integer.parseInt(s.nextLine());
-                } catch (Exception e) {
-                    throw new NumberFormatException("Error: No es un numero");
-                }
-            }
-        }
     }
 
     private void fillc() {
@@ -115,7 +99,10 @@ public class PetriNetworks {
         n0 = new Node(size++);
         n0.setMarker(m0);
         n0.setType('f');
-        n0.setParent(null);
+
+        ArrayList<Node> y = new ArrayList();
+        y.add(new Node(-1));
+        n0.setParent(y);
 
         rp.add(n0);
         procesados.add(n0);
@@ -128,8 +115,8 @@ public class PetriNetworks {
                 for (int i = 0; i < rp.size(); i++) {
                     if (rp.get(i).getType() != 'f' && nk.getMarker().equals(rp.get(i).getMarker())) {
                         nk.setType('d');
-                        cambiaTipo(nk,'d');
-                        g.add(nk.getParent().get(0),rp.get(i));
+                        changeType(nk, 'd');
+                        g.add(nk.getParent().get(0), rp.get(i));
                         break;
                     }
                 }
@@ -152,24 +139,24 @@ public class PetriNetworks {
                                     }
                                 }
 
-                                nz.setMarker(buscaMayor(nz, nz));
+                                nz.setMarker(buscaMayor(nk, nz));
                                 nz.setTransition(j);
                                 nz.setType('f');
 
                                 nk.getChildren().add(nz);
                                 g.add(nk, nz);
-                                
+
                                 rp.add(nz);
                                 procesados.add(nz);
                             }
                         }
                         nk.setType('e');
-                        cambiaTipo(nk, 'e');
-                        asignaNiños(nk, nk.getChildren());
+                        changeType(nk, 'e');
+                        addChildren(nk, nk.getChildren());
 
                     } else {
                         nk.setType('t');
-                        cambiaTipo(nk, 't');
+                        changeType(nk, 't');
                     }
                 }
             }
@@ -177,7 +164,7 @@ public class PetriNetworks {
         }
     }
 
-    private void asignaNiños(Node nk, ArrayList<Node> children) {
+    private void addChildren(Node nk, ArrayList<Node> children) {
         for (int i = 0; i < rp.size(); i++) {
             if (rp.get(i).getId() == nk.getId()) {
                 rp.get(i).setChildren(children);
@@ -186,7 +173,7 @@ public class PetriNetworks {
 
     }
 
-    private void cambiaTipo(Node nk, char t) {
+    private void changeType(Node nk, char t) {
         for (int i = 0; i < rp.size(); i++) {
             if (rp.get(i).getId() == nk.getId()) {
                 rp.get(i).setType(t);
@@ -197,21 +184,28 @@ public class PetriNetworks {
     private ArrayList<Integer> buscaMayor(Node nk, Node nz) {
         ArrayList<Integer> marker = nz.getMarker();
 
-        for (int j = 0; j < nk.getParent().size(); j++) {
-            boolean mayornz = true;
+        boolean mayornz = true;
 
-            for (int i = 0; i < nk.getParent().get(j).getMarker().size(); i++) {
-                if (nz.getMarker().get(i) < nk.getParent().get(j).getMarker().get(i)) {
-                    mayornz = false;
-                    break;
+                
+        for (int i = 0; i < nk.getMarker().size(); i++) {
+            if (nz.getMarker().get(i) < nk.getMarker().get(i)) {
+                mayornz = false;
+                break;
+            }
+        }
+
+        if (mayornz) {
+            for (int a = 0; a < nk.getMarker().size(); a++) {
+                if (nz.getMarker().get(a) > nk.getMarker().get(a)) {
+                    marker.set(a, Integer.MAX_VALUE);
                 }
             }
-            if (mayornz) {
-                for (int a = 0; a < nk.getMarker().size(); a++) {
-                    if (nz.getMarker().get(a) > nk.getParent().get(j).getMarker().get(a)) {
-                        marker.set(a, Integer.MAX_VALUE);
-                    }
-                }
+            return marker;
+        }
+
+        if (nk.getParent() != null) {
+            for (int i = 0; i < nk.getParent().size(); i++) {
+                return buscaMayor(nk.getParent().get(i), nz);
             }
         }
 
@@ -290,14 +284,16 @@ public class PetriNetworks {
     }
 
     private boolean reversibility() {
-       String path;
-     
+        String path;
+
         for (int i = 1; i < rp.size(); i++) {
-            path = g.totalPathFrom((Node) rp.get(i));
-            if (!path.contains("0")) { //If return to the initial state
-                return false;
+            if (rp.get(i).getType() != 'd') {
+                path = g.totalPathFrom((Node) rp.get(i));
+                if (!path.contains("0")) { //If return to the initial state
+                    return false;
+                }
+                g.cleanVisited(); //Clean de path 
             }
-            g.cleanVisited(); //Clean de path 
         }
 
         return true;
@@ -305,9 +301,9 @@ public class PetriNetworks {
 
     private boolean boundedness() {
         for (int i = 0; i < rp.size(); i++) {
-            if(rp.get(i).getMarker().contains(Integer.MAX_VALUE)){
+            if (rp.get(i).getMarker().contains(Integer.MAX_VALUE)) {
                 return false;
-        }
+            }
         }
         return true;
     }
@@ -332,37 +328,49 @@ public class PetriNetworks {
         return true;
     }
 
+    public String imprimirMarcado(ArrayList<Integer> marker) {
+        String marker2 = "";
+
+        for (int i = 0; i < marker.size(); i++) {
+            if (marker.get(i) == Integer.MAX_VALUE) {
+                marker2 = marker2 + "w ";
+            } else {
+                marker2 = marker2 + marker.get(i) + " ";
+            }
+        }
+        return marker2;
+    }
+
     public void printGraph() {
         for (int i = 0; i < rp.size(); i++) {
             System.out.println(rp.get(i).getMarker() + " " + rp.get(i).getType() + "t" + rp.get(i).getTransition());
         }
-        
-        System.out.println("Liveness: "+liveness());
-        System.out.println("Boundedness: "+boundedness());
-        System.out.println("Reversibility: "+reversibility());
-        
-         GraphViz gv = new GraphViz();
-         gv.addln(gv.start_graph());
-         gv.addln("node [shape=box];\n"
-         + " node [fillcolor=\"white\"];\n"
-         + " node [color=\"black\"];\n"
-         + " edge [color=\"black\"];");
-        
-         for(int i=0;i<rp.size();i++){
-             for(int j=0;j<rp.get(i).getChildren().size();j++){
-                gv.addln("\""+rp.get(i).getMarker()+"\" ->"+"\""+rp.get(i).getChildren().get(j).getMarker()
-                        +"\" [label=\"t"+rp.get(i).getChildren().get(j).getTransition()+"\"];");
-            }  
-         }
-           
-        gv.addln(gv.end_graph());
 
-         String type = "png";
-         File out = new File("out." + type);    // Windows
-         gv.writeGraphToFile(gv.getGraph(gv.getDotSource(), type), out);
+        System.out.println("Liveness: " + liveness());
+        System.out.println("Boundedness: " + boundedness());
+        System.out.println("Reversibility: " + reversibility());
+
+        GraphViz gv = new GraphViz();
+        gv.addln(gv.start_graph());
+        gv.addln("node [shape=box];\n"
+                + " node [fillcolor=\"white\"];\n"
+                + " node [color=\"black\"];\n"
+                + " edge [color=\"black\"];");
+
+        for (int i = 0; i < rp.size(); i++) {
+            for (int j = 0; j < rp.get(i).getChildren().size(); j++) {
+                gv.addln("\"" + imprimirMarcado(rp.get(i).getMarker()) + "\" ->" + "\"" + imprimirMarcado(rp.get(i).getChildren().get(j).getMarker())
+                        + "\" [label=\"t" + (rp.get(i).getChildren().get(j).getTransition() + 1) + "\"];");
+            }
+        }
+
+        gv.addln(gv.end_graph());
+        
+        String type = "png";
+        File out = new File("out." + type);    // Windows
+        gv.writeGraphToFile(gv.getGraph(gv.getDotSource(), type), out);
     }
 
-    
     public static void main(String[] ar) {
         PetriNetworks pn = new PetriNetworks();
         pn.reachabilityGraph();
