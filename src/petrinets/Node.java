@@ -2,9 +2,6 @@ package petrinets;
 
 import java.util.ArrayList;
 
-
-
-
 /*
  * To change this license header, choose License Headers in Project Properties.
  * To change this template file, choose Tools | Templates
@@ -15,9 +12,10 @@ import java.util.ArrayList;
  * @author petergtam
  */
 public class Node {
+
     private ArrayList<Integer> marker;
     private char type;
-    private int id; 
+    private int id;
     private Node next;
     private int transition;
     private ArrayList<Node> children;
@@ -39,16 +37,15 @@ public class Node {
         this.children = children;
     }
 
-     
-    public Node(){}
-     
-    public Node(int id){
-        this.id=id;
-        this.marker=new ArrayList();
-        this.children=new ArrayList();
-        this.parent=new ArrayList();
+    public Node() {
     }
-    
+
+    public Node(int id) {
+        this.id = id;
+        this.marker = new ArrayList();
+        this.children = new ArrayList();
+        this.parent = new ArrayList();
+    }
 
     public int getId() {
         return id;
@@ -73,7 +70,7 @@ public class Node {
     public void setTransition(int transition) {
         this.transition = transition;
     }
-    
+
     public ArrayList<Integer> getMarker() {
         return marker;
     }
@@ -89,6 +86,4 @@ public class Node {
     public void setType(char type) {
         this.type = type;
     }
-   
-  
 }

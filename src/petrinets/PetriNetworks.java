@@ -16,16 +16,15 @@ import java.util.Scanner;
 public class PetriNetworks {
 
     int c[][]; //Incidence matrix 
-    int post[][] = {{1, 0, 0}, {1, 1, 0}, {0, 1, 1}}; //matriz post
-    int pre[][] = {{1, 1, 0}, {0, 0, 1}, {0, 0, 1}}; //matriz pre
-    
-    Node n0; //nodo inicial
-    int p, t; //tamaños de los lugares y las transiciones 
-    ArrayList<Integer> m0; //marcdo inicial
-    ArrayList<Node> rp; //arreglo con los nodos
+    int post[][];
+    int pre[][]; 
+    Node n0; 
+    int p, t; //numbers of places and transitions
+    ArrayList<Integer> m0; //initial marker
+    ArrayList<Node> rp; 
     ArrayList<Node> procesados;
     DepthFirstSearchLinkList g;
-    int size = 0; //Numero de nodos creados que ademas almacenara el Id del nodo
+    int size = 0; 
 
     public PetriNetworks(int p, int t, int pre[][], int pos[][], ArrayList<Integer> m0) {
         this.p = p;
@@ -283,7 +282,7 @@ public class PetriNetworks {
         return result;
     }
 
-    private boolean reversibility() {
+   public boolean reversibility() {
         String path;
 
         for (int i = 1; i < rp.size(); i++) {
@@ -299,7 +298,7 @@ public class PetriNetworks {
         return true;
     }
 
-    private boolean boundedness() {
+    public boolean boundedness() {
         for (int i = 0; i < rp.size(); i++) {
             if (rp.get(i).getMarker().contains(Integer.MAX_VALUE)) {
                 return false;
@@ -308,7 +307,7 @@ public class PetriNetworks {
         return true;
     }
 
-    private boolean liveness() {
+    public boolean liveness() {
         ArrayList<Integer> transitions = new ArrayList();
 
         for (int i = 0; i < rp.size(); i++) {
@@ -371,10 +370,5 @@ public class PetriNetworks {
         gv.writeGraphToFile(gv.getGraph(gv.getDotSource(), type), out);
     }
 
-    public static void main(String[] ar) {
-        PetriNetworks pn = new PetriNetworks();
-        pn.reachabilityGraph();
-        pn.printGraph();
-
-    }
+    
 }
