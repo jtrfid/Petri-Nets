@@ -41,6 +41,7 @@ public class DepthFirstSearchLinkList implements DepthFirstSearch {
         if (size >= tree.length) {
             boolean y[] = new boolean[visited.length * 2];
             cleanVisited();
+            visited=y;
             Node x[] = new Node[tree.length * 2];
             System.arraycopy(tree, 0, x, 0, tree.length);
             tree = x;

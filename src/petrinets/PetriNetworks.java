@@ -18,11 +18,12 @@ public class PetriNetworks {
     int c[][]; //Incidence matrix 
     int post[][];
     int pre[][]; 
+    
     Node n0; 
     int p, t; //numbers of places and transitions
     ArrayList<Integer> m0; //initial marker
     ArrayList<Node> rp; 
-    ArrayList<Node> procesados;
+    ArrayList<Node> closed;
     DepthFirstSearchLinkList g;
     int size = 0; 
 
@@ -36,7 +37,7 @@ public class PetriNetworks {
         
         g = new DepthFirstSearchLinkList(10);
         rp = new ArrayList<>();
-        procesados = new ArrayList<>();
+        closed = new ArrayList<>();
 
         fillc();
     }
@@ -44,7 +45,7 @@ public class PetriNetworks {
     public PetriNetworks() {
         m0 = new ArrayList<>();
         rp = new ArrayList<>();
-        procesados = new ArrayList<>();
+        closed = new ArrayList<>();
         g = new DepthFirstSearchLinkList(10);
 
         try (Scanner s = new Scanner(System.in)) {
@@ -63,9 +64,8 @@ public class PetriNetworks {
 
             c = new int[p][t];
 
-            m0.add(1);
-            m0.add(0);
-            m0.add(0);
+            m0.add(2);
+            
            
 
         }
@@ -105,10 +105,10 @@ public class PetriNetworks {
         n0.setParent(y);
 
         rp.add(n0);
-        procesados.add(n0);
+        closed.add(n0);
 
-        while (!procesados.isEmpty()) {
-            Node nk = procesados.remove(0);
+        while (!closed.isEmpty()) {
+            Node nk = closed.remove(0);
 
             if (nk.getType() == 'f') {
                 //Buscar duplicado en rp
@@ -147,7 +147,7 @@ public class PetriNetworks {
                                 g.add(nk, nz);
 
                                 rp.add(nz);
-                                procesados.add(nz);
+                                closed.add(nz);
                             }
                         }
                         nk.setType('e');
@@ -348,7 +348,7 @@ public class PetriNetworks {
 
         System.out.println("Liveness: " + liveness());
         System.out.println("Boundedness: " + boundedness());
-        System.out.println("Reversibility: " + reversibility());
+       System.out.println("Reversibility: " + reversibility());
 
         GraphViz gv = new GraphViz();
         gv.addln(gv.start_graph());
@@ -372,4 +372,11 @@ public class PetriNetworks {
     }
 
     
+    
+    public static void main(String[] ar) {
+        PetriNetworks pn = new PetriNetworks();
+        pn.reachabilityGraph();
+        pn.printGraph();
+
+    }
 }
