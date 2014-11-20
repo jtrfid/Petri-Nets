@@ -7,9 +7,18 @@ package petrinets;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Graphics;
+import java.io.File;
+import java.net.MalformedURLException;
 import java.util.ArrayList;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.swing.ImageIcon;
 import javax.swing.table.DefaultTableModel;
+import org.apache.batik.swing.JSVGCanvas;
+import org.apache.batik.swing.gvt.GVTTreeRendererAdapter;
+import org.apache.batik.swing.gvt.GVTTreeRendererEvent;
+import org.apache.batik.swing.svg.GVTTreeBuilderAdapter;
+import org.apache.batik.swing.svg.GVTTreeBuilderEvent;
 
 /**
  *
@@ -20,6 +29,7 @@ public class Main extends javax.swing.JFrame {
     DefaultTableModel modeloPre = new DefaultTableModel();
     DefaultTableModel modeloPos = new DefaultTableModel();
     DefaultTableModel modeloInicial = new DefaultTableModel();
+    JSVGCanvas jsvgc = new JSVGCanvas();
     int p, t;
 
     public class Imagen extends javax.swing.JPanel {
@@ -87,8 +97,6 @@ public class Main extends javax.swing.JFrame {
         jLabel14 = new javax.swing.JLabel();
         jLabel16 = new javax.swing.JLabel();
 
-        jScrollPane3.setBackground(new java.awt.Color(255, 255, 255));
-
         jTable3.setModel(modeloPre);
         jScrollPane3.setViewportView(jTable3);
 
@@ -128,12 +136,8 @@ public class Main extends javax.swing.JFrame {
         jPanel1.setBackground(new java.awt.Color(255, 255, 255));
         jPanel1.setBorder(javax.swing.BorderFactory.createEtchedBorder());
 
-        jScrollPane1.setBackground(new java.awt.Color(255, 255, 255));
-
         jTable1.setModel(modeloPre);
         jScrollPane1.setViewportView(jTable1);
-
-        jScrollPane2.setBackground(new java.awt.Color(255, 255, 255));
 
         jTable2.setModel(modeloPos);
         jScrollPane2.setViewportView(jTable2);
@@ -154,9 +158,7 @@ public class Main extends javax.swing.JFrame {
         jLabel12.setFont(new java.awt.Font("Tahoma", 1, 11)); // NOI18N
         jLabel12.setText("Mo:");
 
-        jScrollPane4.setBackground(new java.awt.Color(255, 255, 255));
-
-        jTable4.setModel(modeloPre);
+        jTable4.setModel(modeloInicial);
         jScrollPane4.setViewportView(jTable4);
 
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
@@ -305,7 +307,7 @@ public class Main extends javax.swing.JFrame {
                         .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addComponent(jLabel8, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                             .addComponent(lr, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, 23, javax.swing.GroupLayout.PREFERRED_SIZE))
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                        .addGap(0, 0, Short.MAX_VALUE))
                     .addGroup(jPanel2Layout.createSequentialGroup()
                         .addGap(30, 30, 30)
                         .addComponent(jLabel1)
@@ -316,8 +318,8 @@ public class Main extends javax.swing.JFrame {
                         .addGap(18, 18, 18)
                         .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                             .addComponent(jLabel3)
-                            .addComponent(trans, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                        .addGap(18, 18, 18)))
+                            .addComponent(trans, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))))
+                .addGap(18, 18, 18)
                 .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(jPanel2Layout.createSequentialGroup()
                         .addComponent(enter)
@@ -355,7 +357,7 @@ public class Main extends javax.swing.JFrame {
 
         for (int i = 0; i < modeloPos.getRowCount(); i++) {
             for (int j = 0; j < modeloPos.getColumnCount(); j++) {
-                pre[i][j] = Integer.parseInt(modeloPos.getValueAt(i, j).toString());
+                pos[i][j] = Integer.parseInt(modeloPos.getValueAt(i, j).toString());
             }
         }
 
@@ -374,7 +376,7 @@ public class Main extends javax.swing.JFrame {
             lb.setForeground(Color.red);
             lb.setText("False");
         }
-        
+
         if (pn.liveness()) {
             ll.setForeground(new Color(34, 177, 76));
             ll.setText("True");
@@ -382,7 +384,7 @@ public class Main extends javax.swing.JFrame {
             ll.setForeground(Color.red);
             ll.setText("False");
         }
-        
+
         if (pn.reversibility()) {
             lr.setForeground(new Color(34, 177, 76));
             lr.setText("True");
@@ -390,10 +392,40 @@ public class Main extends javax.swing.JFrame {
             lr.setForeground(Color.red);
             lr.setText("False");
         }
-        
-        Imagen Imagen = new Imagen();
-        jPanel3.add(Imagen);
-        jPanel3.repaint();
+
+        jPanel3.add(jsvgc);
+
+        try {
+            jsvgc.setURI(new File("out.svg").toURI().toURL().toString());
+        } catch (MalformedURLException ex) {
+            Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);
+        }
+
+        jsvgc.addGVTTreeBuilderListener(new GVTTreeBuilderAdapter() {
+            @Override
+            public void gvtBuildStarted(GVTTreeBuilderEvent e) {
+                System.out.println("Build Started...");
+            }
+
+            @Override
+            public void gvtBuildCompleted(GVTTreeBuilderEvent e) {
+                System.out.println("Build Done.");
+            }
+        });
+
+        jsvgc.addGVTTreeRendererListener(new GVTTreeRendererAdapter() {
+            @Override
+            public void gvtRenderingPrepare(GVTTreeRendererEvent e) {
+                System.out.println("Rendering Started...");
+            }
+
+            @Override
+            public void gvtRenderingCompleted(GVTTreeRendererEvent e) {
+                System.out.println("Rendering Complete...");
+            }
+        });
+        jsvgc.setSize(400, 400);
+        jPanel3.setSize(400, 400);
     }//GEN-LAST:event_generateActionPerformed
 
     private void enterActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_enterActionPerformed
@@ -401,15 +433,15 @@ public class Main extends javax.swing.JFrame {
         t = Integer.parseInt(trans.getText());
 
         for (int i = 0; i < t; i++) {
-            modeloPre.addColumn("t" + i);
-            modeloPos.addColumn("t" + i);
+            modeloPre.addColumn("t" + (i + 1));
+            modeloPos.addColumn("t" + (i + 1));
         }
 
         Object[] num = {};
         for (int i = 0; i < p; i++) {
             modeloPre.addRow(num);
             modeloPos.addRow(num);
-            modeloPos.addColumn("");
+            modeloInicial.addColumn("p" + (i + 1));
         }
 
         modeloInicial.addRow(num);

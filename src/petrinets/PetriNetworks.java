@@ -28,11 +28,12 @@ public class PetriNetworks {
 
     public PetriNetworks(int p, int t, int pre[][], int pos[][], ArrayList<Integer> m0) {
         this.p = p;
-        this.t = p;
+        this.t = t;
         this.pre = pre;
         this.post = pos;
         this.m0 = m0;
-
+        this.c = new int[this.p][this.t];
+        
         g = new DepthFirstSearchLinkList(10);
         rp = new ArrayList<>();
         procesados = new ArrayList<>();
@@ -365,7 +366,7 @@ public class PetriNetworks {
 
         gv.addln(gv.end_graph());
         
-        String type = "png";
+        String type = "svg";
         File out = new File("out." + type);    // Windows
         gv.writeGraphToFile(gv.getGraph(gv.getDotSource(), type), out);
     }
